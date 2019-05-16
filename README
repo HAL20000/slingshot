@@ -12,6 +12,8 @@ at http://github.com/ryanakca/slingshot
 
 See http://github.com/ryanakca/slingshot/commits/master for a detailed listing.
 
+ - Introduced arbitrary mixing of Black Holes and planets
+
 v0.9r1:
  - Fix bug in network games (disappearing planets)
 
