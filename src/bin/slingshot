@@ -181,7 +181,7 @@ class Game:
         self.graphics_menu.add("Particles")
         self.graphics_menu.add("Full Screen")
 
-        self.planet_menu = Numeric("Maximum number of planets", self.max_planets, 1, 8, 2)
+        self.planet_menu = Numeric("Maximum number of planets", self.max_planets, 1, 8, 0)
 
         self.blackholes_menu = Numeric("Maximum number of black holes", self.max_blackholes, 1, 3, 0)
 
@@ -363,10 +363,8 @@ class Game:
                 n = randint(1, Settings.MAX_BLACKHOLES)
                 for i in xrange(n):
                     result.add(Blackhole(result, self.background))
-            else:
-                # Only have planets if we don't have any
-                # blackholes.
-                n = randint(2, Settings.MAX_PLANETS)
+            if Settings.MAX_PLANETS > 0:
+                n = randint(1, Settings.MAX_PLANETS)
                 for i in xrange(n):
                     result.add(Planet(result, self.background))
         else:
