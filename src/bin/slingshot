@@ -353,7 +353,7 @@ class Game:
             else:
                 nn = n
             for i in xrange(nn):
-                self.particlesystem.add(Particle(pos, size))
+                self.particlesystem.add(Particle(self.planetsprites, pos, size))
 
     def create_planets(self, planetlist=None):
         result = pygame.sprite.RenderPlain()
@@ -388,7 +388,7 @@ class Game:
         if self.round_over:
             self.round_init()
         elif not self.firing:
-            self.missile.launch(self.players[self.player])
+            self.missile.launch(self.players[self.player], self.planetsprites)
             self.players[self.player].attempts += 1
             self.last = self.player
             self.player = 0
