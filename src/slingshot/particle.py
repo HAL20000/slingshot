@@ -80,7 +80,8 @@ class Particle(pygame.sprite.Sprite):
 
                 self.sol = scipy.integrate.solve_ivp (rhs, [0,
                     Settings.MAX_FLIGHT + 10], [self.pos[0], self.pos[1], self.v[0],
-                        self.v[1]], dense_output = True)
+                        self.v[1]], dense_output = True, rtol = 0.2,
+                        method='RK23')
 
         def max_flight(self):
                 if self.flight < 0:
@@ -232,7 +233,7 @@ class Missile(Particle):
 
                 self.sol = scipy.integrate.solve_ivp (rhs, [0,
                     Settings.MAX_FLIGHT + 10], [self.pos[0], self.pos[1], self.v[0],
-                        self.v[1]], dense_output = True)
+                        self.v[1]], dense_output = True, rtol = 1e-3)
 
         def update_players(self, players):
                 result = 1
