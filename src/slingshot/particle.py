@@ -54,6 +54,8 @@ class Particle(pygame.sprite.Sprite):
                 self.flight = Settings.MAX_FLIGHT
                 self.last_sol = None
 
+                c = 3e1
+
                 def rhs (t, y):
                     a = (0.0, 0.0)
                     for p in planets:
@@ -76,12 +78,16 @@ class Particle(pygame.sprite.Sprite):
                         # It's been a tick, update our velocity according to our
                         # acceleration
                         #self.v = (self.v[0] - a[0], self.v[1] - a[1])
-                    return [y[2], y[3], a[0], a[1]]
+                    #print y
+                    #print (y[3] * y[3] - y[4] * y[4] - y[5] * y[5])
+                    ginv = 1 / math.sqrt (y[2] * y[2] + y[3] * y[3] + 1 * 1 * c * c)
+                    return [c * ginv * y[2], c * ginv * y[3], a[0], a[1]]
 
+                gamma = 1 / math.sqrt (1 - (self.v[0]**2 + self.v[1]**2) / (c**2))
                 self.sol = scipy.integrate.solve_ivp (rhs, [0,
-                    Settings.MAX_FLIGHT + 10], [self.pos[0], self.pos[1], self.v[0],
-                        self.v[1]], dense_output = True, rtol = 0.2,
-                        method='RK23')
+                    Settings.MAX_FLIGHT + 10], [self.pos[0], self.pos[1], gamma
+                        * self.v[0], gamma * self.v[1]], dense_output = True,
+                    rtol = 0.2, method='RK23')
 
         def max_flight(self):
                 if self.flight < 0:
@@ -111,7 +117,10 @@ class Particle(pygame.sprite.Sprite):
                 res = self.sol.sol (Settings.MAX_FLIGHT - self.flight)
                 self.pos = (res[0], res[1])
                         #tuple (res[0:1])
-                self.v = (res[2], res[3])
+                c = 3e1
+                ginv = c / math.sqrt (res[2] * res[2] + res[3] * res[3] + 1 * 1 * c
+                        * c)
+                self.v = (ginv * res[2], ginv * res[3])
                 #tuple (res[2:3])
 
                 if not self.in_range():
@@ -123,7 +132,7 @@ class Particle(pygame.sprite.Sprite):
                         # d is not the distance from the planet, it's the distance squared.
                         d = (self.pos[0] - p_pos[0])**2 + (self.pos[1] - p_pos[1])**2
                         if p.type == "Blackhole":
-                                min_dist = p.get_mass()
+                                min_dist = 2 * Settings.g * p.get_mass() / 9e6
                                 if d <= min_dist:
                                         self.impact_pos = p_pos
                                         self.pos = self.impact_pos
@@ -169,14 +178,17 @@ class Particle(pygame.sprite.Sprite):
                 #scene
 
         def visible(self):
-                """
-                Returns whether or not the particle is within the playing area.
+            """
+            Returns whether or not the particle is within the playing area.
 
-                """
+            """
+            try:
                 if pygame.Rect(0, 0, 800, 600).collidepoint(self.pos):
                         return True
                 else:
                         return False
+            except:
+                return False
 
         def get_pos(self):
                 return self.pos
@@ -207,6 +219,8 @@ class Missile(Particle):
 
                 self.score = -Settings.PENALTY_FACTOR * speed
 
+                c = 3e1
+
                 def rhs (t, y):
                     a = (0.0, 0.0)
                     for p in planets:
@@ -229,11 +243,16 @@ class Missile(Particle):
                         # It's been a tick, update our velocity according to our
                         # acceleration
                         #self.v = (self.v[0] - a[0], self.v[1] - a[1])
-                    return [y[2], y[3], a[0], a[1]]
+                    #print y
+                    #print (y[3] * y[3] - y[4] * y[4] - y[5] * y[5])
+                    ginv = 1 / math.sqrt (y[2] * y[2] + y[3] * y[3] + 1 * 1 * c * c)
+                    return [c * ginv * y[2], c * ginv * y[3], a[0], a[1]]
 
+                gamma = 1 / math.sqrt (1 - (self.v[0]**2 + self.v[1]**2) / (c**2))
                 self.sol = scipy.integrate.solve_ivp (rhs, [0,
-                    Settings.MAX_FLIGHT + 10], [self.pos[0], self.pos[1], self.v[0],
-                        self.v[1]], dense_output = True, rtol = 1e-3)
+                    Settings.MAX_FLIGHT + 10], [self.pos[0], self.pos[1], gamma
+                        * self.v[0], gamma * self.v[1]], dense_output = True,
+                    rtol = 1e-5)
 
         def update_players(self, players):
                 result = 1
@@ -256,7 +275,9 @@ class Missile(Particle):
                 rect.midtop = (399, 5)
                 screen.blit(txt, rect.topleft)
                 if self.flight >= 0:
-                        txt = Settings.font.render("Timeout in %d" %(self.flight), 1,(255,255,255))
+                    txt = Settings.font.render("Timeout in %d, Speed: %f"
+                            %(self.flight, math.sqrt (self.v[0]**2 +
+                                self.v[1]**2) / 3e1), 1,(255,255,255))
                 else:
                         txt = Settings.font.render("Shot timed out...", 1, (255,255,255))
                 rect = txt.get_rect()

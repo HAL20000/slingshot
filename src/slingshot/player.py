@@ -245,8 +245,11 @@ class Player(pygame.sprite.Sprite):
 		self.rect = image.get_rect(center = center)
 
 	def hit(self, pos):
-		if not self.rect.collidepoint(pos):
+                try:
+		    if not self.rect.collidepoint(pos):
 			return False
+                except:
+                    return False ##????
 
 		x = int(round(pos[0] - self.rect.topleft[0]))
 		y = int(round(pos[1] - self.rect.topleft[1]))
