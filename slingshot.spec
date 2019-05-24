@@ -3,10 +3,10 @@
 block_cipher = None
 
 
-a = Analysis(['/usr/bin/slingshot'],
-             pathex=['build/lib/', 'Z:\\home\\hal\\slingshot'],
+a = Analysis(['build/scripts-2.7/slingshot'],
+             pathex=['build/lib.linux-x86_64-2.7/'],
              binaries=[],
-             datas=[('build/lib/slingshot/data/', 'slingshot/data/'), ('build/scripts-2.7/slingshot', 'slingshot')],
+             datas=[('build/lib.linux-x86_64-2.7/slingshot/data/', 'slingshot/data/'), ('build/scripts-2.7/slingshot', 'slingshot')],
              hiddenimports=[],
              hookspath=[],
              runtime_hooks=[],
